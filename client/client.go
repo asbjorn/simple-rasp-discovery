@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/shirou/gopsutil/host"
 )
 
 // GetMyIP returns the local IP
@@ -37,6 +38,25 @@ type Options struct {
 var options Options
 var parser = flags.NewParser(&options, flags.Default)
 
+// GetPayload creates the data
+func GetPayload() url.Values {
+	myip := GetMyIP()
+
+	data := url.Values{}
+	data.Add("device", "happymeter")
+	data.Add("ip", myip)
+
+	uptime, err := host.Uptime()
+	log.Println("System uptime:", uptime)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	uptimeStr := strconv.Itoa(int(uptime))
+	data.Add("uptime", uptimeStr)
+
+	return data
+}
+
 func main() {
 	if _, err := parser.Parse(); err != nil {
 		return
@@ -49,12 +69,7 @@ func main() {
 
 	log.Println("Trying to connect to", urlStr)
 
-	myip := GetMyIP()
-	log.Println("My IP: ", myip)
-
-	data := url.Values{}
-	data.Add("device", "happymeter")
-	data.Add("ip", myip)
+	data := GetPayload()
 
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
