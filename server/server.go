@@ -25,6 +25,10 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	device := r.FormValue("device")
 	ip := r.FormValue("ip")
 	log.Printf("device=%s, ip=%s", device, ip)
+
+	for k, v := range r.Form {
+		log.Printf("debug: key=%s, value=%s", k, v)
+	}
 }
 
 // Test service
