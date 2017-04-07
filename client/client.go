@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -43,7 +44,13 @@ func GetPayload() url.Values {
 	myip := GetMyIP()
 
 	data := url.Values{}
-	data.Add("device", "happymeter")
+	hostname, err := os.Hostname()
+	if err != nil {
+		data.Add("device", "unknown")
+	} else {
+		data.Add("device", hostname)
+	}
+
 	data.Add("ip", myip)
 
 	uptime, err := host.Uptime()
