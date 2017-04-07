@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/shirou/gopsutil/host"
@@ -32,7 +33,6 @@ func GetMyIP() string {
 // Options flags
 type Options struct {
 	Server string `short:"s" long:"server" description:"Full http address for the server to connect to. i.e. http://example.com:8080/my_endpoint" required:"true"`
-	Port   string `short:"p" long:"port" description:"Port number if needed. Default is 80" default:"80"`
 }
 
 var options Options
@@ -62,12 +62,15 @@ func main() {
 		return
 	}
 
+	current_time := time.Now().Local()
+	log.Println("Raspberry discovery client: ", current_time)
+
 	discoveryService := options.Server
 
 	u, _ := url.ParseRequestURI(discoveryService)
 	urlStr := fmt.Sprintf("%v", u)
 
-	log.Println("Trying to connect to", urlStr)
+	log.Println("Connecting to", urlStr)
 
 	data := GetPayload()
 
