@@ -4,18 +4,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-func main() {
-	fmt.Println("vim-go")
+var port = 8080
 
+func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/ping", Ping).Methods("POST")
 	router.HandleFunc("/test", Test).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Println("Raspberry Discovery Server started on port..: " + strconv.Itoa(port))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 
 }
 
