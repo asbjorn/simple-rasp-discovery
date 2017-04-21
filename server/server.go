@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jessevdk/go-flags"
@@ -21,9 +21,10 @@ var parser = flags.NewParser(&options, flags.Default)
 
 // Device is a data holder for Device info
 type Device struct {
-	Name   string
-	IP     string
-	Uptime string
+	Name   string `json:"name"`
+	IP     string `json:"ip"`
+	Uptime string `json:"uptime"`
+	Time   string `json:"time"`
 }
 
 // Response is the JSON response with all registered Devices included
@@ -66,6 +67,8 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	d.Name = dName
 	d.IP = ip
 	d.Uptime = uptime
+	t := time.Now()
+	d.Time = t.Format("2006-01-02 15:04:05")
 
 	devices[dName] = d
 
@@ -86,6 +89,8 @@ func Devices(w http.ResponseWriter, r *http.Request) {
 	respObj := &Response{Devices: units}
 	resp, err := json.Marshal(respObj)
 
+	w.Header().Set("Content-Type", "application/json")
+
 	if err != nil {
 		//return 500, err
 		log.Fatalf("Facking error: %v", err)
@@ -93,6 +98,6 @@ func Devices(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("500 - Something bad happened!"))
 		return
 	}
-
-	fmt.Fprintf(w, string(resp))
+	//fmt.Fprintf(w, string(resp))
+	w.Write(resp)
 }
